@@ -1,0 +1,66 @@
+<mat-toolbar color="primary">
+  <span>📚 BiblioApp - Catálogo de Libros</span>
+  <span class="spacer"></span>
+  <button mat-button [matMenuTriggerFor]="menu">
+    {{ authService.getCurrentUser()?.nombre || 'Usuario' }}
+    <mat-icon>arrow_drop_down</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item routerLink="/mis-reservas">
+      <mat-icon>bookmark</mat-icon> Mis Reservas
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>exit_to_app</mat-icon> Cerrar Sesión
+    </button>
+  </mat-menu>
+</mat-toolbar>
+
+<div class="container">
+  <div class="header">
+    <h2>📖 Libros Disponibles</h2>
+    <p>Selecciona un libro para realizar tu reserva</p>
+  </div>
+
+  <div class="libros-grid">
+    <mat-card *ngFor="let libro of libros" class="libro-card">
+      <mat-card-header>
+        <mat-card-title>{{ libro.titulo }}</mat-card-title>
+        <mat-card-subtitle>ISBN: {{ libro.isbn || 'N/A' }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Año: {{ libro.anio_publicacion || 'No especificado' }}</p>
+        <p>Categoría ID: {{ libro.categoria_id }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="abrirModalReserva(libro)">
+          <mat-icon>bookmark_add</mat-icon> Reservar
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <div *ngIf="libros.length === 0" class="empty-state">
+      <mat-icon>menu_book</mat-icon>
+      <p>No hay libros disponibles en este momento</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de reserva -->
+<div class="modal-overlay" *ngIf="showReservaModal" (click)="cerrarModal()">
+  <mat-card class="modal-card" (click)="$event.stopPropagation()">
+    <mat-card-header>
+      <mat-card-title>Confirmar Reserva</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>¿Deseas reservar el libro <strong>{{ selectedLibro?.titulo }}</strong>?</p>
+      <form [formGroup]="reservaForm">
+        <input type="hidden" formControlName="libro_id">
+        <input type="hidden" formControlName="usuario_id">
+      </form>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button (click)="cerrarModal()">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="reservar()">Confirmar Reserva</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

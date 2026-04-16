@@ -1,0 +1,66 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/catalogo">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span>📚 BiblioApp - Mis Reservas</span>
+  <span class="spacer"></span>
+  <button mat-button [matMenuTriggerFor]="menu">
+    {{ authService.getCurrentUser()?.nombre || 'Usuario' }}
+    <mat-icon>arrow_drop_down</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item routerLink="/catalogo">
+      <mat-icon>menu_book</mat-icon> Catálogo
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>exit_to_app</mat-icon> Cerrar Sesión
+    </button>
+  </mat-menu>
+</mat-toolbar>
+
+<div class="container">
+  <div class="header">
+    <h2>📋 Mis Reservas</h2>
+    <p>Gestiona tus reservas activas y realizadas</p>
+  </div>
+
+  <div class="reservas-list">
+    <mat-card *ngFor="let reserva of reservas" class="reserva-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar [color]="getEstadoColor(reserva.estado)">
+          {{ reserva.estado === 'ACTIVA' ? 'bookmark' : (reserva.estado === 'DEVUELTA' ? 'check_circle' : 'cancel') }}
+        </mat-icon>
+        <mat-card-title>{{ reserva.Libro?.titulo || 'Libro #' + reserva.libro_id }}</mat-card-title>
+        <mat-card-subtitle>
+          Reservado: {{ reserva.fecha_reserva | date:'dd/MM/yyyy HH:mm' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p><strong>Estado:</strong> 
+          <mat-chip [color]="getEstadoColor(reserva.estado)" selected>
+            {{ reserva.estado }}
+          </mat-chip>
+        </p>
+        <p *ngIf="reserva.fecha_devolucion">
+          <strong>Devuelto:</strong> {{ reserva.fecha_devolucion | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+      </mat-card-content>
+      <mat-card-actions *ngIf="reserva.estado === 'ACTIVA'">
+        <button mat-raised-button color="warn" (click)="cancelarReserva(reserva.id)">
+          <mat-icon>cancel</mat-icon> Cancelar
+        </button>
+        <button mat-raised-button color="accent" (click)="devolverLibro(reserva.id)">
+          <mat-icon>assignment_return</mat-icon> Devolver
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <div *ngIf="reservas.length === 0" class="empty-state">
+      <mat-icon>bookmark_border</mat-icon>
+      <p>No tienes reservas realizadas</p>
+      <button mat-raised-button color="primary" routerLink="/catalogo">
+        Ver catálogo de libros
+      </button>
+    </div>
+  </div>
+</div>

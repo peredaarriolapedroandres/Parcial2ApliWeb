@@ -1,0 +1,21 @@
+<h2>Mis Reservas</h2>
+
+<div *ngIf="reservas.length === 0">
+  No tienes reservas activas.
+</div>
+
+<div *ngFor="let reserva of reservas" style="margin-bottom: 10px;">
+  <strong>{{ reserva.tituloLibro }}</strong>
+  <span> - Estado: {{ reserva.estado }}</span>
+  <br />
+
+  <button mat-button color="warn"
+          (click)="cancelarReserva(reserva.id)">
+    Cancelar
+  </button>
+
+  <button mat-button color="primary"
+          (click)="devolverLibro(reserva.id)">
+    Devolver
+  </button>
+</div>
